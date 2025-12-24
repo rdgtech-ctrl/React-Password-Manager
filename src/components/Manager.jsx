@@ -3,6 +3,7 @@ import React, { useRef, useState, useEffect } from 'react';
 
 const Manager = () => {
     const ref = useRef()
+    const passwordRef = useRef()
     const [form, setform] = useState({ site: "", username: "", password: "" })
     const [passwordArray, setPasswordArray] = useState([])
 
@@ -13,14 +14,19 @@ const Manager = () => {
         }
     }, [])
 
+    const copyText = (text) => {
+        navigator.clipboard.writeText(text)
+    }
 
     const showPassword = () => {
-        alert("show the password");
+        passwordRef.current.type = "text"
         if (ref.current.src.includes("icons/eyecross.png")) {
             ref.current.src = "icons/eye.png"
+            passwordRef.current.type = "password"
         }
         else {
             ref.current.src = "icons/eyecross.png"
+            passwordRef.current.type = "text"
         }
     }
     const savePassword = () => {
@@ -54,8 +60,8 @@ const Manager = () => {
                         <div className="relative">
 
 
-                            <input value={form.password} onChange={handleChange}
-                                placeholder="Enter Password" className="rounded-full border border-green-500 w-full p-4 py-1" type="text" name="password" />
+                            <input ref={passwordRef} value={form.password} onChange={handleChange}
+                                placeholder="Enter Password" className="rounded-full border border-green-500 w-full p-4 py-1" type="password" name="password" />
                             <span className='absolute right-[2px] top-[5px] cursor-pointer' onClick={showPassword}>
                                 <img ref={ref}
                                     className='p-1'
@@ -88,10 +94,43 @@ const Manager = () => {
                             </thead>
                             <tbody className='bg-green-100'>
                                 {passwordArray.map((item, index) => {
-                                    return<tr key={index}>
-                                        <td className='py-2 border border-white text-center w-32'><a href={item.site} target='_blank'>{item.site}</a></td>
-                                        <td className='py-2 border border-white text-center w-32'>{item.username}</td>
-                                        <td className='py-2 border border-white text-center w-32'>{item.password}</td>
+                                    return <tr key={index}>
+                                        <td className='py-2 border border-white text-center'>
+                                            <div className="flex items-center justify-center">
+                                                <a href={item.site} target='_blank'>{item.site}</a>
+                                                <div className="lordiconcopy size-7  cursor-pointer" onClick={()=> copyText(item.site)}>
+                                                    <lord-icon
+                                                        style={{ "width": "25px", "height": "25px", "padding-top": "3px", "padding-left": "3px", }} src="https://cdn.lordicon.com/iykgtsbt.json" trigger="hover">
+                                                    </lord-icon>
+                                                </div>
+                                            </div>
+
+                                        </td>
+
+
+
+
+
+                                        <td className='py-2 border border-white text-center '>
+                                            <div className="flex items-center justify-center">
+                                                <span>{item.username}</span>
+                                                <div className="lordiconcopy size-7  cursor-pointer" onClick={()=> copyText(item.username)}>
+                                                    <lord-icon
+                                                        style={{ "width": "25px", "height": "25px", "padding-top": "3px", "padding-left": "3px", }} src="https://cdn.lordicon.com/iykgtsbt.json" trigger="hover">
+                                                    </lord-icon>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className='items-center justify-center py-2 border border-white text-center '>
+                                            <div className="flex items-center justify-center" >
+                                                <span>{item.password}</span>
+                                                <div className="lordiconcopy size-7  cursor-pointer" onClick={()=> copyText(item.password)}>
+                                                    <lord-icon
+                                                        style={{ "width": "25px", "height": "25px", "padding-top": "3px", "padding-left": "3px", }} src="https://cdn.lordicon.com/iykgtsbt.json" trigger="hover">
+                                                    </lord-icon></div>
+                                            </div>
+                                        </td>
+
                                     </tr>
                                 })}
 
@@ -100,7 +139,7 @@ const Manager = () => {
                         </table>
                     }
                 </div>
-            </div>
+            </div >
         </>
     )
 }
