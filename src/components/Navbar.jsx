@@ -12,10 +12,10 @@ const Navbar = () => {
 
 
                 </div>
-        
-                <button className="bg-green-800 my-5  rounded-full flex gap-4 justify-center items-center px-4 py-0.5 border-2 border-green-400 ">
+
+                <button className="bg-green-800 my-5  rounded-full flex gap-1 justify-center items-center  ring-white ring-1">
                     <img className=" w-10 p-1 " src="/icons/github.svg" alt="github logo" />
-                    <span className="font-semibold text-blue-600">GitHub</span>
+                    <span className="font-semibold text-blue-600  px-2 ">GitHub</span>
                 </button>
             </div>
         </nav>
