@@ -1,7 +1,5 @@
-
-
 import React, { useRef, useState, useEffect } from 'react';
-import { ToastContainer, toast, Bounce } from 'react-toastify';  
+import { ToastContainer, toast, Bounce } from 'react-toastify';  // ✅ Import Bounce
 import 'react-toastify/dist/ReactToastify.css';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -11,11 +9,19 @@ const Manager = () => {
     const [form, setform] = useState({ site: "", username: "", password: "" })
     const [passwordArray, setPasswordArray] = useState([])
 
-    useEffect(() => {
-        let passwords = localStorage.getItem("passwords");
+    const getPasswords = async () => {
+        let req = await fetch("http://localhost:3000/")
+        let passwords = await req.json()
         if (passwords) {
-            setPasswordArray(JSON.parse(passwords))
+            console.log(passwords)
+            setPasswordArray(passwords)
         }
+    }
+
+
+    useEffect(() => {
+        getPasswords()
+
     }, [])
 
     const copyText = (text) => {
@@ -44,12 +50,17 @@ const Manager = () => {
         }
     }
 
-    const savePassword = () => {
+    const savePassword = async () => {
         if (form.site.length > 3 && form.username.length > 3 && form.password.length > 3) {
             const newPassword = { ...form, id: uuidv4() }
             const updatedPasswords = [...passwordArray, newPassword]
+            //If any such id exisits in the db, deleted it
+            await fetch("http://localhost:3000/", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: form.id }) })
+
             setPasswordArray(updatedPasswords)
-            localStorage.setItem("passwords", JSON.stringify(updatedPasswords))
+            await fetch("http://localhost:3000/", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...form, id: uuidv4() }) })
+
+            // localStorage.setItem("passwords", JSON.stringify(updatedPasswords))
             setform({ site: "", username: "", password: "" })
             toast('😀 Password saved ', {
                 position: "top-right",
@@ -67,12 +78,14 @@ const Manager = () => {
         }
     }
 
-    const deletePassword = (id) => {
+    const deletePassword = async (id) => {
         console.log("Deleting password with id:", id)
         let c = confirm("Deleting Password ?")
         if (c) {
             setPasswordArray(passwordArray.filter(item => item.id !== id))
-            localStorage.setItem("passwords", JSON.stringify(passwordArray.filter(item => item.id !== id)))
+            // localStorage.setItem("passwords", JSON.stringify(passwordArray.filter(item => item.id !== id)))
+            let res = await fetch("http://localhost:3000/", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...form, id }) })
+
             toast('🗑️ Password Deleted!', {
                 position: "top-right",
                 autoClose: 3000,
@@ -88,7 +101,7 @@ const Manager = () => {
 
     const editPassword = (id) => {
         console.log("Editing password with id:", id)
-        setform(passwordArray.find(i => i.id === id))
+        setform({ ...passwordArray.filter(i => i.id === id)[0], id: id })
         setPasswordArray(passwordArray.filter(item => item.id !== id))
     }
 
@@ -194,8 +207,8 @@ const Manager = () => {
                                         </td>
                                         <td className='items-center py-2 border border-white text-center '>
                                             <div className="flex items-center justify-center" >
-                                                <span>{item.password}</span>
-                                                <div className="lordiconcopy size-7  cursor-pointer" onClick={() => copyText(item.password)}>
+                                                <span>{"*".repeat(item.password.length)}</span>
+                                                <div className="lordiconcopy size-7  cursor-pointer" onClick={() => {copyText(item.password)}}>
                                                     <lord-icon
                                                         style={{ "width": "25px", "height": "25px", "paddingTop": "3px", "paddingLeft": "3px" }} src="https://cdn.lordicon.com/iykgtsbt.json" trigger="hover">
                                                     </lord-icon></div>
